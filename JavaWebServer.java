@@ -89,6 +89,13 @@ public class JavaWebServer
         return;
     }
 
+
+     // return random code
+     // based on weights
+     // currently hard coded:
+     // 60% 200 OK
+     // 30% 503 SERVICE UNAVAILABLE
+     // 10% 504 GATEWAY TIMEOUT
      private static String getHttpReturnCode() {
     	//String[] returnCodes = {"HTTP/1.1 200 OK", "HTTP/1.1 503 SERVICE UNAVAILABLE", "HTTP/1.1 504 GATEWAY TIMEOUT"};
         Random randomGenerator = new Random();

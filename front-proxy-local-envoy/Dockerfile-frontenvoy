@@ -1,0 +1,6 @@
+#FROM envoyproxy/envoy:latest
+FROM buildpack-deps:jessie-scm
+
+RUN apt-get update && apt-get -q install -y \
+    curl
+CMD /opt/envoy -c /etc/front-envoy.json --service-cluster front-proxy

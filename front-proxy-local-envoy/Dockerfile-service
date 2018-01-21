@@ -1,0 +1,13 @@
+FROM openjdk:7-jdk
+
+COPY ./JavaWebServer.java .
+
+# compile and create jar file
+RUN javac ./JavaWebServer.java && \
+    jar cvfe JavaWebServer.jar JavaWebServer *.class
+
+# run the service
+ADD ./front-proxy-local-envoy/start_service.sh /usr/local/bin/start_service.sh
+
+RUN chmod u+x /usr/local/bin/start_service.sh
+ENTRYPOINT /usr/local/bin/start_service.sh

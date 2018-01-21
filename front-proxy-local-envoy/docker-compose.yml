@@ -1,0 +1,53 @@
+version: '2'
+services:
+
+  front-envoy:
+    build:
+      context: ../../
+      dockerfile: front-proxy/front-proxy-local-envoy/Dockerfile-frontenvoy
+    volumes:
+      - ../front-envoy.json:/etc/front-envoy.json
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy
+    networks:
+      - envoymesh
+    expose:
+      - "80"
+      - "8001"
+    ports:
+      - "8000:80"
+      - "8001:8001"
+
+  service1:
+    build:
+      context: ../
+      dockerfile: front-proxy-local-envoy/Dockerfile-service
+    volumes:
+      - ../service-envoy.json:/etc/service-envoy.json
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy
+    networks:
+      envoymesh:
+        aliases:
+          - service1
+    environment:
+      - SERVICE_NAME=1
+    expose:
+      - "80"
+
+  service2:
+    build:
+      context: ../
+      dockerfile: front-proxy-local-envoy/Dockerfile-service
+    volumes:
+      - ../service-envoy.json:/etc/service-envoy.json
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy
+    networks:
+      envoymesh:
+        aliases:
+          - service2
+    environment:
+      - SERVICE_NAME=2
+    expose:
+      - "80"
+
+networks:
+  envoymesh: {}

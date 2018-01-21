@@ -37,7 +37,7 @@ e.g. `docker inspect 567de3a9cefe | grep IPAddress`
 `docker rm $(docker ps -a -q)`
 
 ## Modifying java file
-If making any changes in the java file, oyu can test it locally:
+If making any changes in the java file, it can be tested locally:
 
 ### compile java:
 `javac JavaWebServer.java`
@@ -48,4 +48,7 @@ If making any changes in the java file, oyu can test it locally:
 ### run jar:
 `java -jar JavaWebServer.jar 1234`
 
-Note that the service docker installs jdk-7
+### test it on port 1234
+`curl -v localhost:1234`
+
+:exclamation: Note that the service docker uses jdk-7
