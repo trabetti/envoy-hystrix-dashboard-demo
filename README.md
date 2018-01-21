@@ -3,7 +3,7 @@ using hystrix dashboard.
 It is a system with one front proxy envoy, connected to two identical services, each are a "random server" which returns one of:
 * 200 OK
 * 503 SERVICE UNAVAILABLE
-* 504 GATEWAY TIMEOUT
+* 10s delay (should trigger a timeout since it is set to 5s in the config file)
 
 This sandbox is based on:
 [envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/install/sandboxes/front_proxy)
@@ -21,11 +21,11 @@ you should see:
 
 ```
 CONTAINER ID        IMAGE                              COMMAND                  CREATED             STATUS              PORTS                                          NAMES
-1d4eb1d59b29        frontproxylocalenvoy_front-envoy   "/bin/sh -c '/opt/..."   14 minutes ago      Up 14 minutes       0.0.0.0:8001->8001/tcp, 0.0.0.0:8000->80/tcp   frontproxylocalenvoy_front-envoy_1
-bf13d9a70814        frontproxylocalenvoy_service1      "/bin/sh -c /usr/l..."   14 minutes ago      Up 14 minutes       80/tcp                                         frontproxylocalenvoy_service1_1
-89352a1e457c        frontproxylocalenvoy_service2      "/bin/sh -c /usr/l..."   14 minutes ago      Up 14 minutes       80/tcp                                         frontproxylocalenvoy_service2_1
+1d4eb1d59b29        frontproxy_front-envoy   "/bin/sh -c '/opt/..."   14 minutes ago      Up 14 minutes       0.0.0.0:8001->8001/tcp, 0.0.0.0:8000->80/tcp   frontproxylocalenvoy_front-envoy_1
+bf13d9a70814        frontproxy_service1      "/bin/sh -c /usr/l..."   14 minutes ago      Up 14 minutes       80/tcp                                         frontproxylocalenvoy_service1_1
+89352a1e457c        frontproxy_service2      "/bin/sh -c /usr/l..."   14 minutes ago      Up 14 minutes       80/tcp                                         frontproxylocalenvoy_service2_1
 ```
-2. `docker inspect frontproxylocalenvoy_front-envoy_1 | grep IPAddress`
+2. `docker inspect frontproxy_front-envoy_1 | grep IPAddress`
 
 result is something like:
 
@@ -82,13 +82,17 @@ Welcome to Random Web Server #2
 * Connection #0 to host 172.21.0.4 left intact
 ```
 
+:exclamation: Note that on each run, docker-compose may switch between the IP Addresses of the 
+different containers, so it is important to inspect the IP Address every time
+
+
 ### stop and remove all running dockers:
 `docker stop $(docker ps -a -q)`
 
 `docker rm $(docker ps -a -q)`
 
 ## Modifying java file
-If making any changes in the java file, it can be tested locally:
+Compilation of the java code is done as part of the docker build. If making any changes in the java file, it can be tested locally:
 
 ### compile java:
 `javac JavaWebServer.java`

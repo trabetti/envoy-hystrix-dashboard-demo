@@ -15,12 +15,12 @@
                   "domains": ["*"],
                   "routes": [
                     {
-                      "timeout_ms": 0,
+                      "timeout_ms": 5000,
                       "prefix": "/service/1",
                       "cluster": "service1"
                     },
                     {
-                      "timeout_ms": 0,
+                      "timeout_ms": 5000,
                       "prefix": "/service/2",
                       "cluster": "service2"
                     }

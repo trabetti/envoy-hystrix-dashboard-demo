@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
  
 public class JavaWebServer
 {
@@ -95,7 +96,7 @@ public class JavaWebServer
      // currently hard coded:
      // 60% 200 OK
      // 30% 503 SERVICE UNAVAILABLE
-     // 10% 504 GATEWAY TIMEOUT
+     // 10% 10s delay - to trigger timeout
      private static String getHttpReturnCode() {
     	//String[] returnCodes = {"HTTP/1.1 200 OK", "HTTP/1.1 503 SERVICE UNAVAILABLE", "HTTP/1.1 504 GATEWAY TIMEOUT"};
         Random randomGenerator = new Random();
@@ -105,8 +106,16 @@ public class JavaWebServer
     		return "HTTP/1.1 200 OK";
     	else if (randomInt < 9)
     		return "HTTP/1.1 503 SERVICE UNAVAILABLE";
-    	else 
-    		return "HTTP/1.1 504 GATEWAY TIMEOUT";
+    	else {
+    		// timeout
+    		try {
+				TimeUnit.SECONDS.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return "HTTP/1.1 200 OK";
+    	}
     }
  
 }
