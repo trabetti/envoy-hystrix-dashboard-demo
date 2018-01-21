@@ -1,0 +1,21 @@
+FROM envoyproxy/envoy:latest
+
+# java for compiling and running the web server
+RUN \
+  apt-get update && \
+  apt-get install -y openjdk-7-jdk && \
+  rm -rf /var/lib/apt/lists/*
+
+# Define commonly used JAVA_HOME variable
+ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
+COPY ./JavaWebServer.java .
+
+# compile and create jar file
+RUN javac ./JavaWebServer.java && \
+    jar cvfe JavaWebServer.jar JavaWebServer *.class
+
+# run the service
+ADD ./start_service.sh /usr/local/bin/start_service.sh
+
+RUN chmod u+x /usr/local/bin/start_service.sh
+ENTRYPOINT /usr/local/bin/start_service.sh
