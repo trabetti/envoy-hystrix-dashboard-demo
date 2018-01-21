@@ -1,6 +1,6 @@
 This directory is for running the envoy-front-proxy-random-service with local envoy
 
-Basically, follow all instructions in [envoy-front-proxy-random-service]
+Basically, follow all instructions in [envoy-front-proxy-random-service](https://github.ibm.com/TALIS/envoy-front-proxy-random-service/blob/master/README.md)
 
 Changes:
 
