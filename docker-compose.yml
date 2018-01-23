@@ -4,7 +4,7 @@ services:
   front-envoy:
     build:
       context: ../
-      dockerfile: front-proxy/Dockerfile-frontenvoy
+      dockerfile: envoy-front-proxy-random-service/Dockerfile-frontenvoy
     volumes:
       - ./front-envoy.json:/etc/front-envoy.json
     networks:
@@ -28,6 +28,8 @@ services:
           - service1
     environment:
       - SERVICE_NAME=1
+      - ERROR_PERCENTAGE=0
+      - TIMEOUT_PERCENTAGE=0
     expose:
       - "80"
 
@@ -43,6 +45,42 @@ services:
           - service2
     environment:
       - SERVICE_NAME=2
+      - ERROR_PERCENTAGE=15
+      - TIMEOUT_PERCENTAGE=5
+    expose:
+      - "80"
+
+  service3:
+    build:
+      context: .
+      dockerfile: Dockerfile-service
+    volumes:
+      - ./service-envoy.json:/etc/service-envoy.json
+    networks:
+      envoymesh:
+        aliases:
+          - service3
+    environment:
+      - SERVICE_NAME=3
+      - ERROR_PERCENTAGE=35
+      - TIMEOUT_PERCENTAGE=15
+    expose:
+      - "80"
+
+  service_slow:
+    build:
+      context: .
+      dockerfile: Dockerfile-service
+    volumes:
+      - ./service-envoy.json:/etc/service-envoy.json
+    networks:
+      envoymesh:
+        aliases:
+          - service_slow
+    environment:
+      - SERVICE_NAME=_slow
+      - ERROR_PERCENTAGE=0
+      - TIMEOUT_PERCENTAGE=50
     expose:
       - "80"
 

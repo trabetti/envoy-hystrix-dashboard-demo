@@ -1,0 +1,30 @@
+version: '2'
+services:
+
+  front-envoy:
+    build:
+      context: .
+      dockerfile: front-proxy-local-envoy/Dockerfile-frontenvoy
+    volumes:
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy
+
+  service1:
+    build:
+      context: .
+      dockerfile: front-proxy-local-envoy/Dockerfile-service
+    volumes:
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy
+
+  service2:
+    build:
+      context: .
+      dockerfile: front-proxy-local-envoy/Dockerfile-service
+    volumes:
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy
+
+  service3:
+    build:
+      context: .
+      dockerfile: front-proxy-local-envoy/Dockerfile-service
+    volumes:
+      - /home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/opt/envoy

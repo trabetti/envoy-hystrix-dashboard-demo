@@ -21,8 +21,15 @@ public class JavaWebServer
  
     public static void main(String[] args) throws IOException
     {
+    	if (args.length == 0) {
+    		errMessage();
+    		return;
+    	}
+    	
     	final int portNumber = Integer.parseInt(args[0]);
-    	final int serviceNum = (args.length > 1) ? Integer.parseInt(args[1]) : 0;
+    	final int errorPercantage = (args.length > 1) ? Integer.parseInt(args[1]) : 0;
+    	final int timeoutPercantage = (args.length > 2) ? Integer.parseInt(args[2]) : 0;
+    	final String serviceNum = (args.length > 3) ? args[3] : "";
        ServerSocket socket = new ServerSocket(portNumber);
  //        ServerSocket socket = new ServerSocket(81);
 
@@ -34,14 +41,15 @@ public class JavaWebServer
                 @Override
                 public void run()
                 {
-                    HandleRequest(connection, portNumber, serviceNum);
+                    HandleRequest(connection, portNumber, errorPercantage, timeoutPercantage, serviceNum);
                 }
             };
             fThreadPool.execute(task);
         }
     }
  
-    private static void HandleRequest(Socket s, int portNumber, int serviceNum)
+    private static void HandleRequest(Socket s, int portNumber, 
+    		int errorPercantage, int timeoutPercantage, String serviceNum)
     {
         BufferedReader in;
         PrintWriter out;
@@ -58,13 +66,14 @@ public class JavaWebServer
  
             out = new PrintWriter(s.getOutputStream(), true);
 //            out.println("HTTP/1.0 200");
-            out.println(getHttpReturnCode());            
+            out.println(getHttpReturnCode(errorPercantage, timeoutPercantage));            
 	    out.println("Content-type: text/html");
             out.println("Server-name: myserver");
             String response = "Welcome to Random Web Server #" + serviceNum + "\n";
-            out.println("Content-length: " + response.length());
+//            out.println("Content-length: " + response.length());
+            out.println("Content-length: " + 0);
             out.println("");
-            out.println(response);
+            //out.println(response);
             out.flush();
             out.close();
             s.close();
@@ -97,16 +106,12 @@ public class JavaWebServer
      // 60% 200 OK
      // 30% 503 SERVICE UNAVAILABLE
      // 10% 10s delay - to trigger timeout
-     private static String getHttpReturnCode() {
+     private static String getHttpReturnCode(int errorPercantage, int timeoutPercantage) {
     	//String[] returnCodes = {"HTTP/1.1 200 OK", "HTTP/1.1 503 SERVICE UNAVAILABLE", "HTTP/1.1 504 GATEWAY TIMEOUT"};
         Random randomGenerator = new Random();
-    	int randomInt = randomGenerator.nextInt(10); 
+    	int randomInt = randomGenerator.nextInt(100); 
     	
-    	if (randomInt < 6)
-    		return "HTTP/1.1 200 OK";
-    	else if (randomInt < 9)
-    		return "HTTP/1.1 503 SERVICE UNAVAILABLE";
-    	else {
+	if (randomInt < timeoutPercantage) {
     		// timeout
     		try {
 				TimeUnit.SECONDS.sleep(10);
@@ -115,7 +120,15 @@ public class JavaWebServer
 				e.printStackTrace();
 			}
     		return "HTTP/1.1 200 OK";
-    	}
+ 	} 
+ 	else if (randomInt < (errorPercantage+timeoutPercantage))
+    		return "HTTP/1.1 503 SERVICE UNAVAILABLE";
+	else
+   		return "HTTP/1.1 200 OK";
     }
+     
+     private static void errMessage() {
+    	 System.out.println("Usage: JavaWebServer portNumber [errorPercantage] [ServiceNumber]");
+     }
  
 }

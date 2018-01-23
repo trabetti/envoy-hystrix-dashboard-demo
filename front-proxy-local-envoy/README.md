@@ -10,8 +10,11 @@ Changes:
 ### Modify docker-compose.yml to mount your local envoy in lines 10,26,42, according to example
 `/home/talis/envoy_fork/build-debug/envoy/source/exe/envoy-debug:/etc/envoy`
 
-### Get the docker IP Address
-use `docker inspect frontproxylocalenvoy_front-envoy_1 | grep IPAddress`
+### Run docker-compose
+`docker-compose -f ../docker-compose.yml -f docker-compose.local-envoy.yml  up --build -d`
+
+### Get the docker IP Address - step 2 - replace command line with
+`docker inspect frontproxylocalenvoy_front-envoy_1 | grep IPAddress`
 
 :exclamation: Note that on each run, docker-compose may switch between the IP Addresses of the 
 different containers, so it is important to inspect the IP Address every time
