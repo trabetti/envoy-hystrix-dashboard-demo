@@ -5,9 +5,6 @@ It is a system with one front proxy envoy, connected to three services, each are
 * 503 SERVICE UNAVAILABLE
 * 10s delay (should trigger a timeout since it is set to 2s in the config file)
 
-service 1 is configured with 0% errors
-service 2 is configured with 20% errors
-service 3 is configured with 50% errors
 
 This sandbox is based on:
 [envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/install/sandboxes/front_proxy)
@@ -26,12 +23,14 @@ git clone https://github.ibm.com/TALIS/envoy-front-proxy-random-service.git
 you should see:
 
 ```
-CONTAINER ID        IMAGE                              COMMAND                  CREATED             STATUS              PORTS                                          NAMES
-525be3db51a0        envoyfrontproxyrandomservice_service1      "/bin/sh -c /usr/l..."   24 minutes ago      Up 24 minutes       80/tcp                                         envoyfrontproxyrandomservice_service1_1
-50796d896aa5        envoyfrontproxyrandomservice_service2      "/bin/sh -c /usr/l..."   24 minutes ago      Up 24 minutes       80/tcp                                         envoyfrontproxyrandomservice_service2_1
-609467be0141        envoyfrontproxyrandomservice_front-envoy   "/bin/sh -c '/opt/..."   24 minutes ago      Up 24 minutes       0.0.0.0:8001->8001/tcp, 0.0.0.0:8000->80/tcp   envoyfrontproxyrandomservice_front-envoy_1
-32fb50949ff0        envoyfrontproxyrandomservice_service3      "/bin/sh -c /usr/l..."   24 minutes ago      Up 24 minutes       80/tcp                                         envoyfrontproxyrandomservice_service3_1
+CONTAINER ID        IMAGE                                       COMMAND                  CREATED             STATUS              PORTS                                          NAMES
+d55f3526c651        envoyfrontproxyrandomservice_service1       "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service1_1
+4d2dc9dff3ae        envoyfrontproxyrandomservice_service3       "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service3_1
+e654a7d1fd4a        envoyfrontproxyrandomservice_front-envoy    "/bin/sh -c '/opt/..."   18 minutes ago      Up 18 minutes       0.0.0.0:8001->8001/tcp, 0.0.0.0:8000->80/tcp   envoyfrontproxyrandomservice_front-envoy_1
+1db2e78248e0        envoyfrontproxyrandomservice_service_slow   "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service_slow_1
+6923d49786a5        envoyfrontproxyrandomservice_service2       "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service2_1
 ```
+
 2. `docker inspect envoyfrontproxyrandomservice_front-envoy_1 | grep IPAddress`
 
 result is something like:
@@ -52,6 +51,8 @@ different containers, so it is important to inspect the IP Address every time
 `curl -v <envoyfrontproxyrandomservice_front-envoy's IP ADDRESS>:80/service/2`
 
 `curl -v <envoyfrontproxyrandomservice_front-envoy's IP ADDRESS>:80/service/3`
+
+`curl -v <envoyfrontproxyrandomservice_front-envoy's IP ADDRESS>:80/service/slow`
 
 e.g. `curl -v 172.21.0.4:80/service/1`
 
@@ -108,16 +109,15 @@ SERVICE_NUMBER should match the last part of the prefix in front-envoy.json (e.g
 `docker rm $(docker ps -a -q)`
 
 
-
 ## Java Random server
 The Java server returns one of the following, based on input argument errorPercentage:
-* 200 OK (100%-errorPercentage)
-* 503 SERVICE UNAVAILABLE (errorPercentage/2)
-* 10s delay (errorPercentage/2)
+* 200 OK (100%-(errorPercentage+timeoutPercnetage))
+* 503 SERVICE UNAVAILABLE (errorPercentage)
+* 10s delay (timeoutPercnetage)
 
-Usage: `JavaWebServer portNumber errorPercantage ServiceNumber`
+Usage: `JavaWebServer portNumber errorPercantage timeoutPercantage ServiceNumber`
 
-errorPercantage and ServiceNumber are optional, default to '0'
+errorPercantage, timeoutPercantage and ServiceNumber are optional, default to '0'
 
 Compilation of the java code is done as part of the docker build. If making any changes in the java file, it can be tested locally:
 
