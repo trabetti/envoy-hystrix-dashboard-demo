@@ -79,3 +79,7 @@ admin:
     socket_address:
       address: 0.0.0.0
       port_value: 8001
+stats_sinks:
+- name: envoy.stat_sinks.hystrix
+  config:
+    num_of_buckets: 10
