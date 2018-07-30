@@ -1,15 +1,15 @@
-This sandbox can be used for testing error traffic. We used it for testing visualization of traffic with errors through envoy, 
-using hystrix dashboard.
-It is a system with one front proxy envoy, connected to three services, each are a "random server" which returns one of:
+This is a demo for using Hystrix dashboard to monitor traffic in a microservices system.
+
+It is a system with one front proxy envoy, connected to four services, each are a "random response server", which returns one of:
 * 200 OK
 * 503 SERVICE UNAVAILABLE
-* 10s delay (should trigger a timeout since it is set to 2s in the config file)
+* 10s delay (should trigger a timeout since timeout is set to 2s in the config file)
 
 
 This sandbox is based on:
-[envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/install/sandboxes/front_proxy)
+[envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/start/sandboxes/front_proxy)
+With service_1 and service_2 replaced by the random response servers.
 
-Read the description in the link to better understand the system.
 
 ## Clone the repo 
 git clone https://github.ibm.com/TALIS/envoy-front-proxy-random-service.git
@@ -98,7 +98,7 @@ Welcome to Random Web Server #2
 ```
 
 ## run_infinite_curl.sh
-A small script that executes infinte curl commands until stopped 
+A script that executes infinte curl commands until stopped 
 Usage: run_infinite_curl.sh IP_ADDRESS SERVICE_NAME
 SERVICE_NUMBER should match the last part of the prefix in front-envoy.json (e.g. 1,2,3,slow)
 
@@ -119,7 +119,8 @@ Usage: `JavaWebServer portNumber errorPercantage timeoutPercantage ServiceNumber
 
 errorPercantage, timeoutPercantage and ServiceNumber are optional, default to '0'
 
-Compilation of the java code is done as part of the docker build. If making any changes in the java file, it can be tested locally:
+*Compilation of the java code is done as part of the docker build.* 
+However, if making any changes in the java file, it can be tested locally:
 
 ### compile java:
 `javac JavaWebServer.java`
@@ -132,5 +133,3 @@ Compilation of the java code is done as part of the docker build. If making any 
 
 ### test it on port 1234
 `curl -v localhost:1234`
-
-:exclamation: Note that the service docker uses jdk-7
