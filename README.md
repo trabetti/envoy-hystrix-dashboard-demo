@@ -13,17 +13,29 @@ With service_1 and service_2 replaced by the random response servers.
 
 ### Services configuration
 The service configuration can be viewed and changed through the environment variables in [Docker-compose.yml](https://github.com/trabetti/envoy-hystrix-dashboard-demo/blob/master/docker-compose.yml):
+
 Service 1:
+
       - ERROR_PERCENTAGE=0
+
       - TIMEOUT_PERCENTAGE=0
+
 Service 2:
-      - ERROR_PERCENTAGE=15
-      - TIMEOUT_PERCENTAGE=5
+ 
+     - ERROR_PERCENTAGE=15
+ 
+     - TIMEOUT_PERCENTAGE=5
+
 Service 3:
+
       - ERROR_PERCENTAGE=35
+
       - TIMEOUT_PERCENTAGE=15
+
 Service 4:
+
       - ERROR_PERCENTAGE=0
+
       - TIMEOUT_PERCENTAGE=50
 
 ### Enable Hystrix event stream in Envoy
@@ -66,6 +78,7 @@ c3cf561cfbf9        envoyfrontproxyrandomservice_service2            "/bin/sh -c
 Note: _open_hystrix_firefox.sh_ assumes that the hystrix dashboard docker container name is _envoyfrontproxyrandomservice_hystrix_dashboard_1_.
 
 If your container have a different name, you can invoke it with an argument:
+
 `source open_hystrix_firefox.sh [<hystrix dashboard docker container name or id>]`
 
 ### Obtain front envoy docker container IP to use by hystrix dashboard
@@ -80,6 +93,7 @@ http://172.18.0.7:8001/hystrix_event_stream
 Note: _open_hystrix_firefox.sh_ assumes that the front envoy docker container name is _envoyfrontproxyrandomservice_front-envoy_1_.
 
 If your container have a different name, you can invoke it with an argument:
+
 `source open_hystrix_firefox.sh [<front envoy docker container name or id>]`
 
 ### Start monitoring streams
@@ -152,16 +166,19 @@ Use the included script to run infinite curl loop per service
 
 `run_infinite_curl.sh SERVICE_NUMBER`
 
-A script that executes infinte curl commands until stopped 
-SERVICE_NUMBER should match the last part of the prefix in front-envoy.json (e.g. 1,2,3,slow)
+SERVICE_NUMBER should match the last part of the prefix in front-envoy.json (e.g. 1,2,3,slow).
+
+This script that executes infinte curl commands until stopped. 
+
+
 
 ### Check Hystrix dashboard
-Now we should be able to see some traffic. Recall the services [setup](#services-configuration)
+Now we should be able to see some traffic. Recall the services [setup](#services-configuration).
 We can see in service 1 now a lot of traffic, and no errors, this is since it only return 200 OK status code.
 In the other services we can see errors, and they serve less traffic, since they are occasionaly stopped by delayed responses.
 
 You can confirm that the results shown in the dashboard are similar to the configuration
-[screenshot](demo/hystrix-dashboard-activity-screenshot.png?raw=true "Screenshot of activity monitored in hystrix dashboard")
+![screenshot](demo/hystrix-dashboard-activity-screenshot.png?raw=true "Screenshot of activity monitored in hystrix dashboard")
 
 ## Helpful information
 
