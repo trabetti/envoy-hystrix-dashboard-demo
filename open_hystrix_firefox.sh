@@ -1,10 +1,17 @@
 #!/bin/bash
 
+if [ $# -eq 1 ]
+  then
+    HYSTRIX_DOCKER_NAME=$1
+  else
+    HYSTRIX_DOCKER_NAME=envoyfrontproxyrandomservice_hystrix_dashboard_1
+fi
+
 HYSTRIX_DOCKER_NAME=envoyfrontproxyrandomservice_hystrix_dashboard_1
 HYSTRIX_IP=`docker inspect $HYSTRIX_DOCKER_NAME | grep IPAddress | tail -1 | sed 's/\"//g' | sed 's/,//' | awk '{print $2}'`
 
-FRONT_ENVOY_DOCKER_NAME=envoyfrontproxyrandomservice_front-envoy_1
-FRONT_ENVOY_IP=`docker inspect $HYSTRIX_DOCKER_NAME | grep IPAddress | tail -1 | sed 's/\"//g' | sed 's/,//' | awk '{print $2}'`
+#FRONT_ENVOY_DOCKER_NAME=envoyfrontproxyrandomservice_front-envoy_1
+#FRONT_ENVOY_IP=`docker inspect $HYSTRIX_DOCKER_NAME | grep IPAddress | tail -1 | sed 's/\"//g' | sed 's/,//' | awk '{print $2}'`
 
 echo "Openning hystrix dashboard.."
 echo "firefox $HYSTRIX_IP:8080"

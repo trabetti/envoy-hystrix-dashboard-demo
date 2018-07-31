@@ -84,5 +84,16 @@ services:
     expose:
       - "80"
 
+  hystrix_dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile-hystrix
+    networks:
+      envoymesh:
+        aliases:
+          - hystrix_dashboard
+    expose:
+      - "8080"
+
 networks:
   envoymesh: {}

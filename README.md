@@ -1,51 +1,99 @@
-This sandbox can be used for testing error traffic. We used it for testing visualization of traffic with errors through envoy, 
-using hystrix dashboard.
-It is a system with one front proxy envoy, connected to three services, each are a "random server" which returns one of:
+This is a demo for using Hystrix dashboard to monitor traffic in a microservices system.
+
+## Demo environment setup
+It is a system with one front proxy envoy, connected to four services, each are a "random response server", which returns one of:
 * 200 OK
 * 503 SERVICE UNAVAILABLE
-* 10s delay (should trigger a timeout since it is set to 2s in the config file)
+* 10s delay (should trigger a timeout since timeout is set to 2s in the config file)
 
 
 This sandbox is based on:
-[envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/install/sandboxes/front_proxy)
+[envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/start/sandboxes/front_proxy)
+With service_1 and service_2 replaced by the random response servers.
 
-Read the description in the link to better understand the system.
+### Services configuration
+The service configuration can be viewed and changed through the environment variables in [Docker-compose.yml](https://github.com/trabetti/envoy-hystrix-dashboard-demo/blob/master/docker-compose.yml):
+Service 1:
+      - ERROR_PERCENTAGE=0
+      - TIMEOUT_PERCENTAGE=0
+Service 2:
+      - ERROR_PERCENTAGE=15
+      - TIMEOUT_PERCENTAGE=5
+Service 3:
+      - ERROR_PERCENTAGE=35
+      - TIMEOUT_PERCENTAGE=15
+Service 4:
+      - ERROR_PERCENTAGE=0
+      - TIMEOUT_PERCENTAGE=50
+
+### Enable Hystrix event stream in Envoy
+Enable Hystrix sink in the config file:
+```
+stats_sinks:
+- name: envoy.stat_sinks.hystrix
+  config:
+    num_of_buckets: 10
+```
+See [full configuration file](https://github.com/trabetti/envoy-hystrix-dashboard-demo/blob/master/front-envoy.yaml)
 
 ## Clone the repo 
-git clone https://github.ibm.com/TALIS/envoy-front-proxy-random-service.git
+`git clone https://github.com/trabetti/envoy-hystrix-dashboard-demo.git`
 
-## Run docker compose:
+## Setup the demo environment
+Instructions for setting up the demo system on Ubuntu.
+
+### Run docker compose:
 `docker-compose up --build -d`
 
-### get the IP:
-1. `docker ps -a`
+### Check that all the services are running:
+`docker ps -a`
 
-you should see:
-
-```
-CONTAINER ID        IMAGE                                       COMMAND                  CREATED             STATUS              PORTS                                          NAMES
-d55f3526c651        envoyfrontproxyrandomservice_service1       "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service1_1
-4d2dc9dff3ae        envoyfrontproxyrandomservice_service3       "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service3_1
-e654a7d1fd4a        envoyfrontproxyrandomservice_front-envoy    "/bin/sh -c '/opt/..."   18 minutes ago      Up 18 minutes       0.0.0.0:8001->8001/tcp, 0.0.0.0:8000->80/tcp   envoyfrontproxyrandomservice_front-envoy_1
-1db2e78248e0        envoyfrontproxyrandomservice_service_slow   "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service_slow_1
-6923d49786a5        envoyfrontproxyrandomservice_service2       "/bin/sh -c /usr/l..."   18 minutes ago      Up 18 minutes       80/tcp                                         envoyfrontproxyrandomservice_service2_1
-```
-
-2. `docker inspect envoyfrontproxyrandomservice_front-envoy_1 | grep IPAddress`
-
-result is something like:
+you should see something like:
 
 ```
-            "SecondaryIPAddresses": null,
-            "IPAddress": "",
-                    "IPAddress": "172.21.0.4",
+CONTAINER ID        IMAGE                                            COMMAND                  CREATED             STATUS              PORTS                                                     NAMES
+ed7b43e1aee1        envoyfrontproxyrandomservice_front-envoy         "/usr/bin/dumb-init …"   3 hours ago         Up 3 hours          0.0.0.0:8001->8001/tcp, 10000/tcp, 0.0.0.0:8000->80/tcp   envoyfrontproxyrandomservice_front-envoy_1
+e44d3e267b3b        envoyfrontproxyrandomservice_service1            "/bin/sh -c /usr/loc…"   3 hours ago         Up 3 hours          80/tcp, 10000/tcp                                         envoyfrontproxyrandomservice_service1_1
+c026e905c4f9        envoyfrontproxyrandomservice_service3            "/bin/sh -c /usr/loc…"   3 hours ago         Up 3 hours          80/tcp, 10000/tcp                                         envoyfrontproxyrandomservice_service3_1
+c3cf561cfbf9        envoyfrontproxyrandomservice_service2            "/bin/sh -c /usr/loc…"   3 hours ago         Up 3 hours          80/tcp, 10000/tcp                                         envoyfrontproxyrandomservice_service2_1
+3b7b1e8d07c9        envoyfrontproxyrandomservice_service_slow        "/bin/sh -c /usr/loc…"   3 hours ago         Up 3 hours          80/tcp, 10000/tcp                                         envoyfrontproxyrandomservice_service_slow_1
+9ff428a2df14        envoyfrontproxyrandomservice_hystrix_dashboard   "java -cp jetty-runn…"   3 hours ago         Up 3 hours          8080/tcp                                                  envoyfrontproxyrandomservice_hystrix_dashboard_1
 ```
 
-:exclamation: Note that on each run, docker-compose may replace the IP Addresses of the 
-different containers, so it is important to inspect the IP Address every time
+### Open firefox browser with hystrix dashboard
+`source open_hystrix_firefox.sh`
 
+Note: _open_hystrix_firefox.sh_ assumes that the hystrix dashboard docker container name is _envoyfrontproxyrandomservice_hystrix_dashboard_1_.
 
-### call the services:
+If your container have a different name, you can invoke it with an argument:
+`source open_hystrix_firefox.sh [<hystrix dashboard docker container name or id>]`
+
+### Obtain front envoy docker container IP to use by hystrix dashboard
+`source open_hystrix_firefox.sh`
+
+you should see something like:
+```
+Paste the following address into hystrix dashboard. Then click "Add Stream", followed by "Monitor Streams"
+http://172.18.0.7:8001/hystrix_event_stream
+```
+
+Note: _open_hystrix_firefox.sh_ assumes that the front envoy docker container name is _envoyfrontproxyrandomservice_front-envoy_1_.
+
+If your container have a different name, you can invoke it with an argument:
+`source open_hystrix_firefox.sh [<front envoy docker container name or id>]`
+
+### Start monitoring streams
+Paste the URL that was printed on screen in the previous step into hystrix dashboard. Then click "Add Stream", followed by "Monitor Streams".
+
+![Screenshot](demo/hystrix-dashboard-start-page.png?raw=true "Setting up Hystrix dashboard to connect to Envoy URL")
+
+## Generating traffic
+You may notice that we don't see anything going on in the dashboard.. That is because we haven't generated traffic yet.
+
+### Get envoyfrontproxyrandomservice_front-envoy's IP ADDRESS
+`source get_ip_by_container_name_or_id.sh envoyfrontproxyrandomservice_front-envoy_1`
+
+### Use curl to call the services:
 `curl -v <envoyfrontproxyrandomservice_front-envoy's IP ADDRESS>:80/service/1`
 
 `curl -v <envoyfrontproxyrandomservice_front-envoy's IP ADDRESS>:80/service/2`
@@ -54,54 +102,68 @@ different containers, so it is important to inspect the IP Address every time
 
 `curl -v <envoyfrontproxyrandomservice_front-envoy's IP ADDRESS>:80/service/slow`
 
-e.g. `curl -v 172.21.0.4:80/service/1`
+e.g. `curl -v 172.18.0.7:80/service/1`
 
 you should see something like:
 
 ```
-$ curl -v 172.21.0.4:80/service/1
-*   Trying 172.21.0.4...
-* Connected to 172.21.0.4 (172.21.0.4) port 80 (#0)
+$ curl -v 172.18.0.7:80/service/1
+*   Trying 172.18.0.7...
+* Connected to 172.18.0.7 (172.18.0.7) port 80 (#0)
 > GET /service/1 HTTP/1.1
-> Host: 172.21.0.4
-> User-Agent: curl/7.47.0
-> Accept: */*
-> 
-< HTTP/1.1 503 Service Unavailable
-< content-type: text/html
-< server-name: myserver
-< content-length: 32
-< x-envoy-upstream-service-time: 0
-< date: Sun, 21 Jan 2018 11:06:48 GMT
-< server: envoy
-< 
-Welcome to Random Web Server #1
-* Connection #0 to host 172.21.0.4 left intact
-$ curl -v 172.21.0.4:80/service/2
-*   Trying 172.21.0.4...
-* Connected to 172.21.0.4 (172.21.0.4) port 80 (#0)
-> GET /service/2 HTTP/1.1
-> Host: 172.21.0.4
+> Host: 172.18.0.7
 > User-Agent: curl/7.47.0
 > Accept: */*
 > 
 < HTTP/1.1 200 OK
 < content-type: text/html
 < server-name: myserver
-< content-length: 32
-< x-envoy-upstream-service-time: 1
-< date: Sun, 21 Jan 2018 11:07:01 GMT
+< content-length: 0
+< x-envoy-upstream-service-time: 2
+< date: Tue, 31 Jul 2018 06:58:44 GMT
 < server: envoy
 < 
-Welcome to Random Web Server #2
-* Connection #0 to host 172.21.0.4 left intact
+* Connection #0 to host 172.18.0.7 left intact
 ```
 
-## run_infinite_curl.sh
-A small script that executes infinte curl commands until stopped 
-Usage: run_infinite_curl.sh IP_ADDRESS SERVICE_NAME
+When getting an error response:
+```
+$ curl -v 172.18.0.7:80/service/3
+*   Trying 172.18.0.7...
+* Connected to 172.18.0.7 (172.18.0.7) port 80 (#0)
+> GET /service/3 HTTP/1.1
+> Host: 172.18.0.7
+> User-Agent: curl/7.47.0
+> Accept: */*
+> 
+< HTTP/1.1 503 Service Unavailable
+< content-type: text/html
+< server-name: myserver
+< content-length: 0
+< x-envoy-upstream-service-time: 4
+< date: Tue, 31 Jul 2018 07:00:04 GMT
+< server: envoy
+< 
+* Connection #0 to host 172.18.0.7 left intact
+```
+
+### Generate heavier traffic
+Use the included script to run infinite curl loop per service
+
+`run_infinite_curl.sh SERVICE_NUMBER`
+
+A script that executes infinte curl commands until stopped 
 SERVICE_NUMBER should match the last part of the prefix in front-envoy.json (e.g. 1,2,3,slow)
 
+### Check Hystrix dashboard
+Now we should be able to see some traffic. Recall the services [setup](#services-configuration)
+We can see in service 1 now a lot of traffic, and no errors, this is since it only return 200 OK status code.
+In the other services we can see errors, and they serve less traffic, since they are occasionaly stopped by delayed responses.
+
+You can confirm that the results shown in the dashboard are similar to the configuration
+[screenshot](demo/hystrix-dashboard-activity-screenshot.png?raw=true "Screenshot of activity monitored in hystrix dashboard")
+
+## Helpful information
 
 ### stop and remove all running dockers:
 `docker stop $(docker ps -a -q)`
@@ -119,7 +181,8 @@ Usage: `JavaWebServer portNumber errorPercantage timeoutPercantage ServiceNumber
 
 errorPercantage, timeoutPercantage and ServiceNumber are optional, default to '0'
 
-Compilation of the java code is done as part of the docker build. If making any changes in the java file, it can be tested locally:
+*Compilation of the java code is done as part of the docker build.* 
+However, if making any changes in the java file, it can be compiled and tested locally:
 
 ### compile java:
 `javac JavaWebServer.java`
@@ -132,5 +195,3 @@ Compilation of the java code is done as part of the docker build. If making any 
 
 ### test it on port 1234
 `curl -v localhost:1234`
-
-:exclamation: Note that the service docker uses jdk-7
