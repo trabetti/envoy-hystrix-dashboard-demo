@@ -1,6 +1,6 @@
 This is a demo for using Hystrix dashboard to monitor traffic in a microservices system.
 
-## Demo environment setup
+# Demo environment setup
 It is a system with one front proxy envoy, connected to four services, each are a "random response server", which returns one of:
 * 200 OK
 * 503 SERVICE UNAVAILABLE
@@ -9,7 +9,7 @@ It is a system with one front proxy envoy, connected to four services, each are 
 
 This sandbox is based on:
 [envoy front proxy](https://www.envoyproxy.io/docs/envoy/latest/start/sandboxes/front_proxy)
-With service_1 and service_2 replaced by the random response servers.
+with service_1 and service_2 replaced by the random response servers.
 
 ### Services configuration
 The service configuration can be viewed and changed through the environment variables in [Docker-compose.yml](https://github.com/trabetti/envoy-hystrix-dashboard-demo/blob/master/docker-compose.yml):
@@ -17,25 +17,21 @@ The service configuration can be viewed and changed through the environment vari
 Service 1:
 
       - ERROR_PERCENTAGE=0
-
       - TIMEOUT_PERCENTAGE=0
 
 Service 2:
  
-     - ERROR_PERCENTAGE=15
- 
-     - TIMEOUT_PERCENTAGE=5
+      - ERROR_PERCENTAGE=15
+      - TIMEOUT_PERCENTAGE=5
 
 Service 3:
 
       - ERROR_PERCENTAGE=35
-
       - TIMEOUT_PERCENTAGE=15
 
 Service 4:
 
       - ERROR_PERCENTAGE=0
-
       - TIMEOUT_PERCENTAGE=50
 
 ### Enable Hystrix event stream in Envoy
@@ -51,7 +47,7 @@ See [full configuration file](https://github.com/trabetti/envoy-hystrix-dashboar
 ## Clone the repo 
 `git clone https://github.com/trabetti/envoy-hystrix-dashboard-demo.git`
 
-## Setup the demo environment
+# Setup the demo environment
 Instructions for setting up the demo system on Ubuntu.
 
 ### Run docker compose:
@@ -101,7 +97,7 @@ Paste the URL that was printed on screen in the previous step into hystrix dashb
 
 ![Screenshot](demo/hystrix-dashboard-start-page.png?raw=true "Setting up Hystrix dashboard to connect to Envoy URL")
 
-## Generating traffic
+# Generating traffic
 You may notice that we don't see anything going on in the dashboard.. That is because we haven't generated traffic yet.
 
 ### Get envoyfrontproxyrandomservice_front-envoy's IP ADDRESS
@@ -161,14 +157,14 @@ $ curl -v 172.18.0.7:80/service/3
 * Connection #0 to host 172.18.0.7 left intact
 ```
 
-### Generate heavier traffic
+### Generate automated traffic
 Use the included script to run infinite curl loop per service
 
 `run_infinite_curl.sh SERVICE_NUMBER`
 
-SERVICE_NUMBER should match the last part of the prefix in front-envoy.json (e.g. 1,2,3,slow).
+SERVICE_NUMBER should match the last part of the prefix in front-envoy.yaml (e.g. 1,2,3,slow).
 
-This script that executes infinte curl commands until stopped. 
+This script executes infinte curl commands until stopped. 
 
 
 
@@ -180,7 +176,7 @@ In the other services we can see errors, and they serve less traffic, since they
 You can confirm that the results shown in the dashboard are similar to the configuration
 ![screenshot](demo/hystrix-dashboard-activity-screenshot.png?raw=true "Screenshot of activity monitored in hystrix dashboard")
 
-## Helpful information
+## Useful shortuct
 
 ### stop and remove all running dockers:
 `docker stop $(docker ps -a -q)`
@@ -198,17 +194,18 @@ Usage: `JavaWebServer portNumber errorPercantage timeoutPercantage ServiceNumber
 
 errorPercantage, timeoutPercantage and ServiceNumber are optional, default to '0'
 
-*Compilation of the java code is done as part of the docker build.* 
-However, if making any changes in the java file, it can be compiled and tested locally:
+**There is no need to compile the jave code - compilation of the java code is done as part of the docker build.** 
 
-### compile java:
+However, if making any changes in the java file, it can be compiled and tested with the following commands:
+
+#### compile java:
 `javac JavaWebServer.java`
 
-### build jar:
+#### build jar:
 `jar cvfe JavaWebServer.jar JavaWebServer *.class`
 
-### run jar:
+#### run jar on port 1234:
 `java -jar JavaWebServer.jar 1234`
 
-### test it on port 1234
+#### test it on port 1234
 `curl -v localhost:1234`
