@@ -80,7 +80,7 @@ If your container have a different name, you can invoke it with an argument:
 `source open_hystrix_firefox.sh [<hystrix dashboard docker container name or id>]`
 
 ### Obtain front envoy docker container IP to use by hystrix dashboard
-`source open_hystrix_firefox.sh`
+`source get_stream_for_hystrix_dashboard.sh`
 
 you should see something like:
 ```
@@ -88,11 +88,11 @@ Paste the following address into hystrix dashboard. Then click "Add Stream", fol
 http://172.18.0.7:8001/hystrix_event_stream
 ```
 
-Note: _open_hystrix_firefox.sh_ assumes that the front envoy docker container name is _envoyfrontproxyrandomservice_front-envoy_1_.
+Note: _get_stream_for_hystrix_dashboard.sh_ assumes that the front envoy docker container name is _envoyfrontproxyrandomservice_front-envoy_1_.
 
 If your container have a different name, you can invoke it with an argument:
 
-`source open_hystrix_firefox.sh [<front envoy docker container name or id>]`
+`source get_stream_for_hystrix_dashboard.sh [<front envoy docker container name or id>]`
 
 ### Start monitoring streams
 Paste the URL that was printed on screen in the previous step into hystrix dashboard. Then click "Add Stream", followed by "Monitor Streams".
