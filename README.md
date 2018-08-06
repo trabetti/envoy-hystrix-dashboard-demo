@@ -34,6 +34,8 @@ Service 4:
       - ERROR_PERCENTAGE=0
       - TIMEOUT_PERCENTAGE=50
 
+![Demo settings](demo/demo_settings.png?raw=true "Demo settings")
+
 ### Enable Hystrix event stream in Envoy
 Enable Hystrix sink in the config file:
 ```
