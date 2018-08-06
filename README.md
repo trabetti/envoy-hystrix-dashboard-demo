@@ -4,7 +4,7 @@ This is a demo for using Hystrix dashboard to monitor traffic in a microservices
 It is a system with one front proxy envoy, connected to four services, each are a "random response server", which returns one of:
 * 200 OK
 * 503 SERVICE UNAVAILABLE
-* 10s delay (should trigger a timeout since timeout is set to 2s in the config file)
+* 10s delay (should trigger a timeout since timeout is set to 2s in the [config file](https://github.com/trabetti/envoy-hystrix-dashboard-demo/blob/fc2070cf2d193f8c12b3cc769d5d5027e70e0e24/service-envoy.yaml#L29))
 
 
 This sandbox is based on:
