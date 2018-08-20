@@ -1,7 +1,7 @@
 This is a demo for using Hystrix dashboard to monitor traffic in a microservices system.
 
 # Demo environment setup
-It is a system with one front proxy envoy, connected to four services, each are a "random response server", which returns one of:
+It is a system with one front proxy envoy, connected to four services, each is a "random response server", which returns one of:
 * 200 OK
 * 503 SERVICE UNAVAILABLE
 * 10s delay (should trigger a timeout since timeout is set to 2s in the [config file](https://github.com/trabetti/envoy-hystrix-dashboard-demo/blob/fc2070cf2d193f8c12b3cc769d5d5027e70e0e24/service-envoy.yaml#L29))
@@ -35,6 +35,9 @@ Service 4:
       - TIMEOUT_PERCENTAGE=50
 
 ![Demo settings](demo/demo_settings.png?raw=true "Demo settings")
+
+### Connecting fron-envoy to Hystrix Dashboard
+Envoy sends through the Hystrix event stream the statistics of its upstream clusters. Therfore, we will configure the front-envoy and connect the Hystrix dashboard to its admin port.
 
 ### Enable Hystrix event stream in Envoy
 Enable Hystrix sink in the config file:
