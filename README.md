@@ -52,6 +52,9 @@ See [full configuration file](https://github.com/trabetti/envoy-hystrix-dashboar
 ## Clone the repo 
 `git clone https://github.com/trabetti/envoy-hystrix-dashboard-demo.git`
 
+# Requirements
+* [docker-compose](https://docs.docker.com/compose/install/)
+
 # Setup the demo environment
 Instructions for setting up the demo system on Ubuntu.
 
