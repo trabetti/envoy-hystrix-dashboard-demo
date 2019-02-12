@@ -36,8 +36,8 @@ Service 4:
 
 ![Demo settings](demo/demo_settings.png?raw=true "Demo settings")
 
-### Connecting fron-envoy to Hystrix Dashboard
-Envoy sends through the Hystrix event stream the statistics of its upstream clusters. Therfore, we will configure the front-envoy and connect the Hystrix dashboard to its admin port.
+### Connecting front-envoy to Hystrix Dashboard
+Envoy sends through the Hystrix event stream the statistics of its upstream clusters. Therefore, we will configure the front-envoy and connect the Hystrix dashboard to its admin port.
 
 ### Enable Hystrix event stream in Envoy
 Enable Hystrix sink in the config file:
